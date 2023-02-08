@@ -1,0 +1,15 @@
+artifact_uri: runs/mlruns/168802254811008225/535bbe7d5c314c23bdea15bbfe83282d/artifacts
+end_time: 1675835256215
+entry_point_name: ''
+experiment_id: '168802254811008225'
+lifecycle_stage: active
+run_id: 535bbe7d5c314c23bdea15bbfe83282d
+run_name: rogue-ox-792
+run_uuid: 535bbe7d5c314c23bdea15bbfe83282d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1675835250468
+status: 3
+tags: []
+user_id: mam47

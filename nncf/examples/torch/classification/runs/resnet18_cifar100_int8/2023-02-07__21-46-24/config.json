@@ -1,0 +1,35 @@
+{
+    "model": "resnet18",
+    "dataset": "cifar100",
+    "input_info": {
+        "sample_size": [2, 3, 32, 32]
+    },
+    "num_classes": 100,
+    "batch_size": 256,
+    "workers": 8,
+    "epochs": 100,
+    "multiprocessing_distributed": true,
+    "optimizer": {
+        "base_lr": 0.00031,
+        "schedule_type": "plateau",
+        "type": "Adam",
+        "schedule_params": {
+            "threshold": 0.1,
+            "cooldown": 3
+        },
+        "weight_decay": 1e-05
+    },
+    "target_device": "TRIAL",
+    "compression": {
+        "algorithm": "quantization",
+        "weights": {
+            "mode": "asymmetric",
+            "bits": 8
+        },
+        "activations": {
+            "mode": "asymmetric",
+            "bits": 8
+        },
+        "quantize_inputs": true
+    }
+}

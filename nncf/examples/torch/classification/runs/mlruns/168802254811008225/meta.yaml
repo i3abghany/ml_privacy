@@ -1,0 +1,6 @@
+artifact_location: runs/mlruns/168802254811008225
+creation_time: 1675835184933
+experiment_id: '168802254811008225'
+last_update_time: 1675835184933
+lifecycle_stage: active
+name: resnet18_cifar100_int8
