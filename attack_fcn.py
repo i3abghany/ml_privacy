@@ -58,12 +58,30 @@ def get_fcn():
     return model
 
 def get_purchase_dataset():
-    # YOU WILL HAVE TO CLONE THE FOLLOWING REPOSITORY FIRST: https://github.com/xehartnort/Purchase100-Texas100-datasets'
-    filename = 'datasets/purchase100.npz'
-    data = np.load(filename)
-    x, y = data['features'], data['labels']
+    input_shape = (600, )
+    num_classes = 100
+
+    # Read raw dataset
+    dataset_path = "datasets/dataset_purchase"
+    with open(dataset_path, "r") as f:
+        purchase_dataset = f.readlines()
+
+    # Separate features and labels into different arrays
+    x, y = [], []
+    for datapoint in purchase_dataset:
+        split = datapoint.rstrip().split(",")
+        label = int(split[0]) - 1  # The first value is the label
+        features = np.array(split[1:], dtype=np.float32)  # The next values are the features
+
+        x.append(features)
+        y.append(label)
+
+    x = np.array(x)
+
+    # Split data into train, test sets
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=1234)
-    return x_train, y_train, x_test, y_test, (600, ), 100
+
+    return x_train, y_train, x_test, y_test, input_shape, num_classes
 
 model = get_fcn()
 x_train, y_train, x_test, y_test, input_shape, num_classes = get_purchase_dataset()
@@ -80,8 +98,7 @@ model.compile(optimizer='adam',
               loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
               metrics=[tf.keras.metrics.CategoricalAccuracy()])
 
-model.fit(x_train, y_train, epochs=1)
-
+model.fit(x_train, y_train, epochs=15)
 
 datahandlerA = ml_privacy_meter.utils.attack_data.AttackData(x_population=x_population,
                                                              y_population=y_population,
@@ -94,9 +111,11 @@ datahandlerA = ml_privacy_meter.utils.attack_data.AttackData(x_population=x_popu
 attackobj = ml_privacy_meter.attack.meminf.initialize(
     target_train_model=model,
     target_attack_model=model,
-    learning_rate=0.0001, optimizer='adam',
+    learning_rate=0.0001,
+    optimizer='adam',
     train_datahandler=datahandlerA,
     attack_datahandler=datahandlerA,
     layers_to_exploit=[5],
-    gradients_to_exploit=[3, 4, 5])
+    gradients_to_exploit=[3, 4, 5],
+    epochs=1)
 attackobj.train_attack()

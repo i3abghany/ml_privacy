@@ -1,2 +1,4 @@
 venv
 ml_privacy_meter
+logs
+datasets/dataset_purchase
