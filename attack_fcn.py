@@ -1,3 +1,6 @@
+import os
+import subprocess
+
 import ml_privacy_meter
 import tensorflow as tf
 import tensorflow.compat.v1.keras.layers as keraslayers
@@ -63,8 +66,15 @@ def get_purchase_dataset():
 
     # Read raw dataset
     dataset_path = "datasets/dataset_purchase"
-    with open(dataset_path, "r") as f:
-        purchase_dataset = f.readlines()
+    try:
+        with open(dataset_path, "r") as f:
+            purchase_dataset = f.readlines()
+    except:
+        os.chdir('datasets')
+        subprocess.call(['bash', './download_purchase100.sh'])
+        os.chdir('..')
+        with open(dataset_path, "r") as f:
+            purchase_dataset = f.readlines()
 
     # Separate features and labels into different arrays
     x, y = [], []
@@ -85,6 +95,8 @@ def get_purchase_dataset():
 
 model = get_fcn()
 x_train, y_train, x_test, y_test, input_shape, num_classes = get_purchase_dataset()
+print('TYPE: ', type(x_train))
+print('SHAPE: ', x_train.shape)
 
 num_datapoints = 5000
 x_target_train, y_target_train = x_train[:num_datapoints], y_train[:num_datapoints]
@@ -93,12 +105,16 @@ x_target_train, y_target_train = x_train[:num_datapoints], y_train[:num_datapoin
 x_population = np.concatenate((x_train, x_test))
 y_population = np.concatenate((y_train, y_test))
 
-print(model)
 model.compile(optimizer='adam', 
               loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
               metrics=[tf.keras.metrics.CategoricalAccuracy()])
-
-model.fit(x_train, y_train, epochs=15)
+# print('sample size: ', y_train[0].shape)
+tmp_y = []
+for i in y_train:
+    tmp_y.append([0] * 100)
+    tmp_y[-1][i] = 1
+y_train_one_hot_encoded = np.array(tmp_y)
+model.fit(x_train, y_train_one_hot_encoded, epochs=1)
 
 datahandlerA = ml_privacy_meter.utils.attack_data.AttackData(x_population=x_population,
                                                              y_population=y_population,
